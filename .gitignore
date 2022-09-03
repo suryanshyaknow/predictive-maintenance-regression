@@ -1,0 +1,8 @@
+# folders to ignore
+__pycache__
+.ml
+.vscode
+
+# files to ignore
+predictive_maintenance.sav
+ai4i2020.log
