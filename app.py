@@ -14,7 +14,7 @@ Log()
 
 @app.route('/', methods=['GET'])
 @cross_origin()
-def homepage():
+def homepage(): 
     return render_template("index.html")
 
 
