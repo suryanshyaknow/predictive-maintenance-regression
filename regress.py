@@ -145,7 +145,7 @@ class LModel:
             lg.info("L1 Model executed!")
         
         except Exception as e:
-            lg.error(e)
+            lg.error("LModel.buildLasso()", e)
             
     def buildRidge(self):
         """
@@ -164,7 +164,7 @@ class LModel:
             lg.info("L2 Model executed!")
                     
         except Exception as e:
-            lg.error(e)
+            lg.error("LModel.buildRidge()", e)
             
     def buildElasticNet(self):
         """
@@ -184,7 +184,7 @@ class LModel:
             
         
         except Exception as e:
-            lg.error(e)
+            lg.error("LModel.builkdElasticNet()", e)
             
     def accuracy(self, mode='Regression'):
         """
@@ -271,7 +271,7 @@ class LModel:
                 return float(self.lModel.predict(std_test_input))
 
         except Exception as e:
-            lg.error("LModel().predict()", e)
+            lg.error("LModel.predict()", e)
 
     def save(self, mode="Regression"):
         """
