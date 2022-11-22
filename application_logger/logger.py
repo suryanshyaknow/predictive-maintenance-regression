@@ -4,7 +4,7 @@ import os
 class Log:
     def __init__(self):
         try:
-            self.logFile="ai4i2020.log"
+            self.logFile=".logs/app.log"
             
             # removing the log file if already exists so as not to congest it.
             if os.path.exists(self.logFile):

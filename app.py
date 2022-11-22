@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS, cross_origin
-from regress import LModel
+from src.regress import LModel
 import logging as lg
-from logger import Log
+from application_logger.logger import Log
 
 app = Flask(__name__)  # intializing the Flask app
 
