@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import os
-import logging as lg
 import pickle
 from sklearn.linear_model import LinearRegression
 from scipy import stats
@@ -9,11 +8,17 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LassoCV, Lasso, RidgeCV, Ridge, ElasticNet, ElasticNetCV
+from application_logger.logger import Logger
+
+# Executing the logger class
+logger_obj = Logger(
+    logger_name=__name__, file_name=__file__, streamLogs=True)
+lgr = logger_obj.get_logger()
 
 
 class LModel:
     """
-    This is a class that is specific to build a regression model to regress against the label column 'Air Temperature [K]'
+    Class specific to build a regression model to regress against the label column 'Air Temperature [K]'
     """
 
     def __init__(self):
@@ -37,7 +42,7 @@ class LModel:
         self.l2Model = None
         self.elasticModel = None
 
-        lg.info("Model building initiates..")
+        lgr.info("Model building initiates..")
 
     def _normalize(self, data):
         """
@@ -55,7 +60,7 @@ class LModel:
             return self._normalize(data_)
 
         except Exception as e:
-            lg.error("LModel._normalize()", e)
+            lgr.error("LModel._normalize()", e)
 
     def _standardize(self, data):
         """
@@ -65,7 +70,7 @@ class LModel:
             return self.scaler.fit_transform(data)
 
         except Exception as e:
-            lg.error("LModel._standardize()", e)
+            lgr.error("LModel._standardize()", e)
 
     def _features(self):
         """
@@ -87,7 +92,7 @@ class LModel:
             return self.X
 
         except Exception as e:
-            lg.error("LModel._features()", e)
+            lgr.error("LModel._features()", e)
 
     def _label(self):
         """
@@ -98,7 +103,7 @@ class LModel:
             return self.Y
 
         except Exception as e:
-            lg.error("LModel._label()", e)
+            lgr.error("LModel._label()", e)
 
     def _split(self):
         try:
@@ -111,7 +116,7 @@ class LModel:
                 X_, self.Y, test_size=0.25, random_state=100)
 
         except Exception as e:
-            lg.error("LModel._split()", e)
+            lgr.error("LModel._split()", e)
 
     def build(self):
         """
@@ -122,12 +127,12 @@ class LModel:
 
             self.lModel = LinearRegression()
 
-            lg.info("readying the model..")
+            lgr.info("readying the model..")
             self.lModel.fit(self.X_train, self.Y_train)
-            lg.info("Model executed succesfully!")
+            lgr.info("Model executed succesfully!")
 
         except Exception as e:
-            lg.error("LModel.build()", e)
+            lgr.error("LModel.build()", e)
 
     def buildLasso(self):
         """
@@ -140,13 +145,13 @@ class LModel:
             lassocv = LassoCV(alphas=None, cv=10, max_iter=1000)
             lassocv.fit(self.X_train, self.Y_train)
 
-            lg.info("readying the L1 Model...")
+            lgr.info("readying the L1 Model...")
             self.l1Model = Lasso(lassocv.alpha_)
             self.l1Model.fit(self.X_train, self.Y_train)
-            lg.info("L1 Model executed!")
+            lgr.info("L1 Model executed!")
 
         except Exception as e:
-            lg.error("LModel.buildLasso()", e)
+            lgr.error("LModel.buildLasso()", e)
 
     def buildRidge(self):
         """
@@ -159,13 +164,13 @@ class LModel:
             ridgecv = RidgeCV(cv=10)
             ridgecv.fit(self.X_train, self.Y_train)
 
-            lg.info("readying the L2 Model...")
+            lgr.info("readying the L2 Model...")
             self.l2Model = Ridge(ridgecv.alpha_)
             self.l2Model.fit(self.X_train, self.Y_train)
-            lg.info("L2 Model executed!")
+            lgr.info("L2 Model executed!")
 
         except Exception as e:
-            lg.error("LModel.buildRidge()", e)
+            lgr.error("LModel.buildRidge()", e)
 
     def buildElasticNet(self):
         """
@@ -184,7 +189,7 @@ class LModel:
             lg.info("ElasticNet Model executed!")
 
         except Exception as e:
-            lg.error("LModel.builkdElasticNet()", e)
+            lgr.error("LModel.builkdElasticNet()", e)
 
     def accuracy(self, mode='Regression'):
         """
@@ -207,11 +212,11 @@ class LModel:
             p = self.X_test.shape[1]               # number of predictors
             accuracy_ = 1-(1 - r_sq)*(n-1)/(n-p-1)  # adjusted r-squared
 
-            lg.info(f"The {mode} model appears to be {accuracy_}% accurate.")
+            lgr.info(f"The {mode} model appears to be {accuracy_}% accurate.")
             return round(accuracy_, 3)
 
         except Exception as e:
-            lg.error("LModel.accuracy()", e)
+            lgr.error("LModel.accuracy()", e)
 
     def predict(self, process_t, rot_speed, torque, tool_wear, machine_failure, twf, hdf, pwf, osf, rnf, mode="Regression"):
         """
@@ -251,7 +256,7 @@ class LModel:
                         return np.power(t_input, lambdA)-1/lambdA
 
                 except Exception as e:
-                    lg.error(e)
+                    lgr.error(e)
 
             # normalization using the function that I just made
             test_input[1] = n_conversion(
@@ -275,7 +280,7 @@ class LModel:
                 return float(self.lModel.predict(std_test_input))
 
         except Exception as e:
-            lg.error("LModel.predict()", e)
+            lgr.error("LModel.predict()", e)
 
     def save(self, mode="Regression"):
         """
@@ -295,7 +300,7 @@ class LModel:
                 pickle.dump(self.lModel, open(
                     "saved_models/model.sav", 'wb'))
 
-            lg.info(f"The {mode} model is saved at {os.getcwd()} sucessfully!")
+            lgr.info(f"The {mode} model is saved at {os.getcwd()} sucessfully!")
 
         except Exception as e:
-            lg.error("LModel.save()", e)
+            lgr.error("LModel.save()", e)
